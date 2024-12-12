@@ -1,25 +1,33 @@
-var builder = WebApplication.CreateBuilder(args);
+using AuthService.Infrastructure.Extensions;
+using Serilog;
 
-// Add services to the container.
+namespace AuthService;
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+public static class Program
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    public static void Main(string[] args)
+    {
+        try
+        {
+            CreateHostBuilder(args).Build().Run();
+        }
+        catch (Exception exc)
+        {
+            Log.Fatal(exc, "Can not properly start Service.");
+        }
+        finally
+        {
+            Log.CloseAndFlush();
+        }
+    }
+
+    private static IHostBuilder CreateHostBuilder(string[] args)
+    {
+        return Host.CreateDefaultBuilder(args)
+            .AddInfrastructure()
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Startup>();
+            });
+    }
 }
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
