@@ -1,6 +1,6 @@
-namespace AuthService.Models.Dto.DTOs;
+﻿namespace AuthService.Broker.Models.Response;
 
-public record LoginResult
+public class GetTokenResponse
 {
     public required string AccessToken { get; init; }
     public required string RefreshToken { get; init; }

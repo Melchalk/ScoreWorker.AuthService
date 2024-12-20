@@ -1,7 +1,14 @@
-﻿using AuthService.Infrastructure.Middlewares;
+﻿using AuthService.Broker.Consumers;
+using AuthService.Business;
+using AuthService.Business.Interfaces;
+using AuthService.Infrastructure.Middlewares;
+using AuthService.Models.Dto.Configurations;
+using AuthService.Token.Helpers;
+using AuthService.Token.Helpers.Interfaces;
 using MassTransit;
 using MassTransit.ExtensionsDependencyInjectionIntegration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 namespace AuthService;
 
@@ -23,16 +30,15 @@ internal class Startup(IConfiguration configuration)
 
         services.AddControllers();
 
-        ConfigureDI(services);
-
         //ConfigureMassTransit(services);
 
         services.AddEndpointsApiExplorer();
 
         services.AddHttpContextAccessor();
 
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme);
-        services.AddAuthorization();
+        ConfigureJwt(services);
+
+        ConfigureDI(services);
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -55,10 +61,10 @@ internal class Startup(IConfiguration configuration)
         });
     }
 
+    #region Private
+
     private void ConfigureMassTransit(IServiceCollection services)
     {
-        ConfigurePublishers(services);
-
         services.AddMassTransit(busConfigurator =>
         {
             busConfigurator.UsingRabbitMq((context, cfg) =>
@@ -71,19 +77,50 @@ internal class Startup(IConfiguration configuration)
         });
     }
 
-    private void ConfigurePublishers(IServiceCollection services)
-    {
-        //services.AddScoped<IMessagePublisher<CreateLibraryRequest, CreateLibraryResponse>, CreateLibraryMessagePublisher>();
-    }
-
     private void ConfigureConsumers(IServiceCollectionBusConfigurator x)
     {
-        //x.AddConsumer<>();
+        x.AddConsumer<CheckTokenConsumer>();
+
+        x.AddConsumer<GetTokenConsumer>();
     }
 
     private void ConfigureDI(IServiceCollection services)
     {
-        //services.AddScoped<ICreateSummaryCommand, CreateSummaryCommand>();
+        services.AddScoped<ILoginCommand, LoginCommand>();
 
+        services.AddScoped<IRefreshTokenCommand, RefreshTokenCommand>();
     }
+
+    private void ConfigureJwt(IServiceCollection services)
+    {
+        var signingKey = new SigningSymmetricKey();
+        var signingDecodingKey = (IJwtSigningDecodingKey)signingKey;
+
+        services.AddSingleton<IJwtSigningEncodingKey>(signingKey);
+        services.AddSingleton<IJwtSigningDecodingKey>(signingKey);
+
+        services.AddTransient<ITokenGenerator, TokenGenerator>();
+        services.AddTransient<ITokenValidator, TokenValidator>();
+
+        services.Configure<TokenSettings>(Configuration.GetSection("TokenSettings"));
+
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = Configuration.GetSection("TokenSettings:TokenIssuer").Value,
+                    ValidateAudience = true,
+                    ValidAudience = Configuration.GetSection("TokenSettings:TokenAudience").Value,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = signingDecodingKey.GetKey()
+                };
+            });
+
+        services.AddAuthorization();
+    }
+
+    #endregion
 }

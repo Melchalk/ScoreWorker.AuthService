@@ -9,9 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MassTransit" Version="8.3.3" />
+    <PackageReference Include="MassTransit" Version="8.3.4" />
     <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.3.1" />
-    <PackageReference Include="MassTransit.RabbitMQ" Version="8.3.3" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.3.4" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageReference Include="Serilog" Version="4.2.0" />
@@ -20,7 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AuthService.Broker\AuthService.Broker.csproj" />
+    <ProjectReference Include="..\AuthService.Business\AuthService.Business.csproj" />
     <ProjectReference Include="..\AuthService.Models.Dto\AuthService.Models.Dto.csproj" />
+    <ProjectReference Include="..\AuthService.Token.Helpers\AuthService.Token.Helpers.csproj" />
   </ItemGroup>
 
 </Project>

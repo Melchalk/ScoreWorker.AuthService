@@ -1,4 +1,6 @@
-﻿namespace AuthService.Infrastructure.Swagger;
+﻿using Microsoft.AspNetCore.Builder;
+
+namespace AuthService.Infrastructure.Swagger;
 
 public class SwaggerStartupFilter : IStartupFilter
 {
@@ -7,7 +9,7 @@ public class SwaggerStartupFilter : IStartupFilter
         return app =>
         {
             app.UseSwagger();
-            app.UseSwaggerUI();
+            app.UseSwagger();
             next(app);
         };
     }

@@ -1,4 +1,4 @@
-namespace AuthService.Models.Dto.DTOs;
+namespace AuthService.Models.Dto.Requests;
 
 public record LoginRequest
 {

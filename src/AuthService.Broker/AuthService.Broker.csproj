@@ -7,7 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Consumers\" />
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.3.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AuthService.Models.Dto\AuthService.Models.Dto.csproj" />
+    <ProjectReference Include="..\AuthService.Token.Helpers\AuthService.Token.Helpers.csproj" />
   </ItemGroup>
 
 </Project>

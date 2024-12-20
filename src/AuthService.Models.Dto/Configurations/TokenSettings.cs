@@ -1,4 +1,4 @@
-namespace AuthService.Models.Dto.DTOs;
+namespace AuthService.Models.Dto.Configurations;
 
 /// <summary>
 /// Token configuration class filled in Startup.cs.

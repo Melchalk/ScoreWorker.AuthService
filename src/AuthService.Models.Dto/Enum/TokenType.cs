@@ -2,6 +2,6 @@
 
 public enum TokenType
 {
-    Auth,
+    Access,
     Refresh
 }

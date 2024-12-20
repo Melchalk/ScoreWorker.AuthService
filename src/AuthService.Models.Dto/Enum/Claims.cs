@@ -2,6 +2,6 @@
 
 public enum Claims
 {
-    Login,
+    UserId,
     TokenType
 }
